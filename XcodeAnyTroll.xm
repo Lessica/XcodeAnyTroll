@@ -198,6 +198,8 @@ static const char *BlockSig(id blockObj)
             LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:gPackageIdentifier];
             LSRecordPromise *recordPromise = [[LSRecordPromise alloc] initWithRecord:appProxy.correspondingApplicationRecord error:nil];
 
+            /* LSRecordPromise is not properly constructed, still need some work here. */
+
             completion(YES, retVal[@"InstalledAppInfoArray"], recordPromise, nil);
             return;
         }
