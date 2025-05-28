@@ -39,6 +39,10 @@ Tested on iOS 15.0/15.4/16.2/16.4/16.5.1 with Dopamine and Dopamine (RootHide) j
 
 - The installation is much slower than normal ones because `trollstorehelper` only accepts `.ipa` files :-(
 
+## Example Project
+
+- [TrollFools](https://github.com/Lessica/TrollFools)
+
 ## LICENSE
 
 WTFPL License
