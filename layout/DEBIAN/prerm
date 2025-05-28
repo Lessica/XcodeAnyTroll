@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ -f /Library/LaunchDaemons/com.82flex.trollinstalld.plist ]; then
+    launchctl unload /Library/LaunchDaemons/com.82flex.trollinstalld.plist || true
+elif [ -f /var/jb/Library/LaunchDaemons/com.82flex.trollinstalld.plist ]; then
+    launchctl unload /var/jb/Library/LaunchDaemons/com.82flex.trollinstalld.plist || true
+else
+    ROOTHIDE_PATH=$(ls -d /var/containers/Bundle/Application/.jbroot-*/Library/LaunchDaemons/com.82flex.trollinstalld.plist)
+    if [ -f "$ROOTHIDE_PATH" ]; then
+        launchctl unload "$ROOTHIDE_PATH" || true
+    fi
+fi
+
+exit 0
