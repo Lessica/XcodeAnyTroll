@@ -215,7 +215,7 @@ static const char *BlockSig(id blockObj)
             HBLogDebug(@TAG "XPC reply received: %@", retVal);
 
             LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:gPackageIdentifier];
-            LSRecordPromise *recordPromise = [[LSRecordPromise alloc] initWithRecord:appProxy.correspondingApplicationRecord error:nil];
+            LSRecordPromise *recordPromise = [[%c(LSRecordPromise) alloc] initWithRecord:appProxy.correspondingApplicationRecord error:nil];
 
             /* LSRecordPromise is not properly constructed in some cases, still need some work here. */
 
