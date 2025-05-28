@@ -1,15 +1,9 @@
-//
-//  LSApplicationProxy.h
-//  XXTPickerCollection
-//
-//  Created by Zheng on 03/05/2017.
-//  Copyright © 2017 Zheng. All rights reserved.
-//
-
 #ifndef LSApplicationProxy_h
 #define LSApplicationProxy_h
 
 #import <UIKit/UIKit.h>
+
+@class LSApplicationRecord;
 
 @interface LSApplicationProxy : NSObject
 
@@ -20,11 +14,11 @@
 - (NSString *)shortVersionString;
 - (NSString *)applicationType;
 - (NSURL *)bundleURL;
-//- (NSURL *)bundleContainerURL;
 - (NSURL *)dataContainerURL;
 - (NSDictionary <NSString *, NSURL *> *)groupContainerURLs;
 
 @property (nonatomic, readonly, copy) NSString *applicationIdentifier;
+@property (nonatomic, readonly, strong) LSApplicationRecord *correspondingApplicationRecord;
 
 @end
 

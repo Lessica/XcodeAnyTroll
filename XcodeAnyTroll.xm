@@ -6,6 +6,8 @@
 #import <libSandy.h>
 #import <libSandyXpc.h>
 
+#import "LSApplicationProxy.h"
+#import "LSRecordPromise.h"
 #import "MCMContainer.h"
 
 #define TAG "[XcodeAnyTroll] "
@@ -22,10 +24,51 @@ static SandyXpcMessagingCenter *GetXpcMessagingCenter(void) {
     return messagingCenter;
 }
 
+#import <Foundation/Foundation.h>
+
+struct BlockDescriptor {
+    unsigned long reserved;
+    unsigned long size;
+    void *rest[1];
+};
+
+struct Block {
+    void *isa;
+    int flags;
+    int reserved;
+    void *invoke;
+    struct BlockDescriptor *descriptor;
+};
+
+__used
+static const char *BlockSig(id blockObj)
+{
+    struct Block *block = (__bridge struct Block *)blockObj;
+    struct BlockDescriptor *descriptor = block->descriptor;
+
+    int copyDisposeFlag = 1 << 25;
+    int signatureFlag = 1 << 30;
+
+    assert(block->flags & signatureFlag);
+
+    int index = 0;
+    if (block->flags & copyDisposeFlag)
+        index += 2;
+
+    return (const char *)descriptor->rest[index];
+}
+
+@interface MIInstallOptions : NSObject
+
+@property (getter=isDeveloperInstall, nonatomic) bool developerInstall;
+
+@end
+
 %hook MICodeSigningVerifier
 
 + (id)_validateSignatureAndCopyInfoForURL:(NSURL *)url withOptions:(id)options error:(NSError **)errorPtr {
     id result = %orig(url, options, errorPtr);
+
     if (errorPtr && *errorPtr) {
         NSError *error = *errorPtr;
         if (![[error description] containsString:@"0xe800801c"] && ![[error description] containsString:@"0xe8008001"]) {
@@ -120,15 +163,55 @@ static SandyXpcMessagingCenter *GetXpcMessagingCenter(void) {
 
 %hook MIClientConnection
 
+/* iOS 16.4+ */
+- (void)_installURL:(NSURL *)url identity:(id)identity targetingDomain:(NSUInteger)domain options:(MIInstallOptions *)options completion:(void (^)(BOOL, NSArray *, id, NSError *))completion {
+    HBLogDebug(@TAG "installURL:%@ withOptions:%@", url, options);
+
+    void (^replCompletion)(BOOL, NSArray *, id, NSError *) = ^(BOOL succeed, NSArray *appList, id recordPromise, NSError *error) {
+        HBLogDebug(@TAG "completion called with appList:%@ recordPromise:%@ error:%@", appList, recordPromise, error);
+        if (!completion) {
+            return;
+        }
+
+        if (gPackagePath && gPackageIdentifier && ([[error description] containsString:@"0xe800801c"] || [[error description] containsString:@"0xe8008001"])) {
+            NSError *error = nil;
+            NSDictionary *retVal = nil;
+
+            retVal = [GetXpcMessagingCenter() sendMessageAndReceiveReplyName:@"InstallPackage" userInfo:@{
+                @"PackagePath": gPackagePath,
+                @"PackageIdentifier": gPackageIdentifier,
+            } error:&error];
+            if (error) {
+                HBLogDebug(@TAG "XPC error occurred: %@", error);
+                completion(succeed, appList, recordPromise, error);
+                return;
+            }
+
+            HBLogDebug(@TAG "XPC reply received: %@", retVal);
+
+            LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:gPackageIdentifier];
+            LSRecordPromise *recordPromise = [[LSRecordPromise alloc] initWithRecord:appProxy.correspondingApplicationRecord error:nil];
+
+            completion(YES, retVal[@"InstalledAppInfoArray"], recordPromise, nil);
+            return;
+        }
+
+        completion(succeed, appList, recordPromise, error);
+    };
+
+    %orig(url, identity, domain, options, replCompletion);
+}
+
+/* iOS 15 */
 - (void)installURL:(NSURL *)url withOptions:(NSDictionary *)options completion:(void (^)(id, NSError *))completion {
     HBLogDebug(@TAG "installURL:%@ withOptions:%@", url, options);
 
     if (![options[@"PackageType"] isEqualToString:@"Developer"]) {
-        %orig(url, options, completion);
+        %orig;
         return;
     }
 
-    void (^replCompletion)(id, NSError *) = ^(NSDictionary *userInfo, NSError *error) {
+    void (^replCompletion)(NSDictionary *, NSError *) = ^(NSDictionary *userInfo, NSError *error) {
         HBLogDebug(@TAG "completion called with userInfo:%@ error:%@", [userInfo[@"InstalledAppInfoArray"] firstObject], error);
         if (!completion) {
             return;
@@ -193,6 +276,12 @@ static void TestConnection(void) {
 %ctor {
     @autoreleasepool {
         void *sandyHandle = dlopen("@rpath/libsandy.dylib", RTLD_LAZY);
+        if (!sandyHandle) {
+            sandyHandle = dlopen("/usr/lib/libsandy.dylib", RTLD_LAZY);
+        }
+        if (!sandyHandle) {
+            sandyHandle = dlopen("@loader_path/.jbroot/usr/lib/libsandy.dylib", RTLD_LAZY);
+        }
         if (sandyHandle) {
             int (*__dyn_libSandy_applyProfile)(const char *profileName) =
                 (int (*)(const char *))dlsym(sandyHandle, "libSandy_applyProfile");

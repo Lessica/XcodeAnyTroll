@@ -11,4 +11,6 @@ else
     fi
 fi
 
+killall -9 installd || true
+
 exit 0

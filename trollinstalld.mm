@@ -78,7 +78,7 @@ __used static const char *installer_binary(void) {
     }
 
     // Prepare arguments for posix_spawn
-    const char *args[] = {trollHelper, "install", [packagePath UTF8String], NULL};
+    const char *args[] = {trollHelper, "install", "force", [packagePath UTF8String], NULL};
     pid_t pid;
     int status;
 
@@ -113,7 +113,9 @@ __used static const char *installer_binary(void) {
 
     // It's ok that we don't return the installed app info here,
     // as the client actually doesn't care about it.
-    return @{@"InstalledAppInfoArray" : @[]};
+    return @{@"InstalledAppInfoArray" : @[@{
+        
+    }]};
 }
 
 @end
