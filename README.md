@@ -17,7 +17,7 @@ Tested on iOS 15.0/15.4/16.2/16.4/16.5.1 with Dopamine and Dopamine (RootHide) j
 
     <img width="499" alt="截屏2025-05-29 上午5 05 42" src="https://github.com/user-attachments/assets/7ca46b03-6554-4e57-a1b8-04e709e1a0bc" />
 
-7. Add a “Run Script” phase to your target with the following content:
+5. Add a “Run Script” phase to your target with the following content:
 
     ```bash
     if [ "$CODE_SIGNING_ALLOWED" = "NO" ]; then
@@ -26,6 +26,13 @@ Tested on iOS 15.0/15.4/16.2/16.4/16.5.1 with Dopamine and Dopamine (RootHide) j
     ```
 
     <img width="743" alt="截屏2025-05-29 上午5 06 20" src="https://github.com/user-attachments/assets/611ee75d-006f-423e-a855-112f31aad808" />
+
+## How does it work?
+
+- Step 1 or 2 is to disable debugging restrictions.
+- Step 3 is to bypass code signing verification of `installd` with `trollstorehelper`.
+- Step 4 is to bypass code signing verification of Xcode.
+- Step 5 is to inject entitlements into the target app.
 
 ## LICENSE
 
