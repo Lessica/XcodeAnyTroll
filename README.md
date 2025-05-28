@@ -8,6 +8,8 @@ Which makes it super easy to develop TrollStore based system apps, or to test yo
 
 Tested on iOS 15.0/15.4/16.2/16.4/16.5.1 with Dopamine and Dopamine (RootHide) jailbreaks. TrollStore is required.
 
+https://github.com/user-attachments/assets/36af81b7-724b-4fb7-b29e-0e71235c2edd
+
 ## How to use?
 
 0. Prepare your jailbroken iOS device for development.
