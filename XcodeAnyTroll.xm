@@ -163,12 +163,18 @@ static const char *BlockSig(id blockObj)
 
 %hook MIClientConnection
 
-/* iOS 16.4+ */
+/* iOS 16.2 */
 - (void)_installURL:(NSURL *)url identity:(id)identity targetingDomain:(NSUInteger)domain options:(MIInstallOptions *)options completion:(void (^)(BOOL, NSArray *, id, NSError *))completion {
     HBLogDebug(@TAG "installURL:%@ withOptions:%@", url, options);
 
+    if (![options isKindOfClass:%c(MIInstallOptions)] || ![options respondsToSelector:@selector(isDeveloperInstall)] || ![options isDeveloperInstall]) {
+        HBLogDebug(@TAG "Not a developer install, skipping custom handling");
+        %orig;
+        return;
+    }
+
     void (^replCompletion)(BOOL, NSArray *, id, NSError *) = ^(BOOL succeed, NSArray *appList, id recordPromise, NSError *error) {
-        HBLogDebug(@TAG "completion called with appList:%@ recordPromise:%@ error:%@", appList, recordPromise, error);
+        HBLogDebug(@TAG "completion called with recordPromise:%@ error:%@", recordPromise, error);
         if (!completion) {
             return;
         }
@@ -207,6 +213,7 @@ static const char *BlockSig(id blockObj)
     HBLogDebug(@TAG "installURL:%@ withOptions:%@", url, options);
 
     if (![options[@"PackageType"] isEqualToString:@"Developer"]) {
+        HBLogDebug(@TAG "Not a developer install, skipping custom handling");
         %orig;
         return;
     }
