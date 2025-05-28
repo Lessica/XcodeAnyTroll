@@ -14,6 +14,7 @@
 
 static NSString *gPackageIdentifier = nil;
 static NSString *gPackagePath = nil;
+static LSRecordPromise *gRecordPromise = nil;
 
 static SandyXpcMessagingCenter *GetXpcMessagingCenter(void) {
     static SandyXpcMessagingCenter *messagingCenter = nil;
@@ -57,6 +58,12 @@ static const char *BlockSig(id blockObj)
 
     return (const char *)descriptor->rest[index];
 }
+
+@interface MIInstaller : NSObject
+
+@property (readonly, nonatomic) LSRecordPromise *recordPromise;
+
+@end
 
 @interface MIInstallOptions : NSObject
 
@@ -161,6 +168,18 @@ static const char *BlockSig(id blockObj)
 
 %end
 
+%hook MIInstaller
+
+- (BOOL)performInstallationWithError:(NSError **)errorPtr {
+    BOOL result = %orig;
+    if (self.recordPromise) {
+        gRecordPromise = self.recordPromise;
+    }
+    return result;
+}
+
+%end
+
 %hook MIClientConnection
 
 /* iOS 16.2 */
@@ -198,9 +217,9 @@ static const char *BlockSig(id blockObj)
             LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:gPackageIdentifier];
             LSRecordPromise *recordPromise = [[LSRecordPromise alloc] initWithRecord:appProxy.correspondingApplicationRecord error:nil];
 
-            /* LSRecordPromise is not properly constructed, still need some work here. */
+            /* LSRecordPromise is not properly constructed in some cases, still need some work here. */
 
-            completion(YES, retVal[@"InstalledAppInfoArray"], recordPromise, nil);
+            completion(YES, retVal[@"InstalledAppInfoArray"], gRecordPromise ?: recordPromise, nil);
             return;
         }
 
