@@ -10,8 +10,9 @@ Tested on iOS 15.0/15.4/16.2/16.4/16.5.1 with Dopamine and Dopamine (RootHide) j
 
 ## How to use?
 
+0. Prepare your jailbroken iOS device for development.
 1. (RootHide) Install “Xcode Any Debug” from <https://roothide.github.io>
-2. (Other) Install and configure “XcodeRootDebug” from <https://apt.82flex.com>
+2. (Other Jailbreaks) Install and configure “XcodeRootDebug” from <https://apt.82flex.com>
 3. Install this tweak from <https://apt.82flex.com>
 4. Open Xcode and modify the target settings of your app: `CODE_SIGNING_ALLOWED=NO`, `ENABLE_USER_SCRIPT_SANDBOXING=NO`
 
