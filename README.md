@@ -13,7 +13,7 @@ Tested on iOS 15.0/15.4/16.2/16.4/16.5.1 with Dopamine and Dopamine (RootHide) j
 1. (RootHide) Install “Xcode Any Debug” from <https://roothide.github.io>
 2. (Other) Install and configure “XcodeRootDebug” from <https://apt.82flex.com>
 3. Install this tweak from <https://apt.82flex.com>
-4. Open Xcode and modify the target settings of your app: `CODE_SIGNING_ALLOWED=NO`
+4. Open Xcode and modify the target settings of your app: `CODE_SIGNING_ALLOWED=NO`, `ENABLE_USER_SCRIPT_SANDBOXING=NO`
 
     <img width="499" alt="截屏2025-05-29 上午5 05 42" src="https://github.com/user-attachments/assets/7ca46b03-6554-4e57-a1b8-04e709e1a0bc" />
 
