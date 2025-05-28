@@ -13,8 +13,8 @@ https://github.com/user-attachments/assets/36af81b7-724b-4fb7-b29e-0e71235c2edd
 ## How to use?
 
 0. Prepare your jailbroken iOS device for development.
-1. (RootHide) Install “Xcode Any Debug” from <https://roothide.github.io>
-2. (Other Jailbreaks) Install and configure “XcodeRootDebug” from <https://apt.82flex.com>
+1. (RootHide, Optional) Install “Xcode Any Debug” from <https://roothide.github.io>
+2. (Other Jailbreaks, Optional) Install and configure “XcodeRootDebug” from <https://apt.82flex.com>
 3. Install this tweak from <https://apt.82flex.com>
 4. Open Xcode and modify the target settings of your app: `CODE_SIGNING_ALLOWED=NO`, `ENABLE_USER_SCRIPT_SANDBOXING=NO`
 
