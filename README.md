@@ -35,6 +35,10 @@ Tested on iOS 15.0/15.4/16.2/16.4/16.5.1 with Dopamine and Dopamine (RootHide) j
 - Step 4 is to bypass code signing verification of Xcode.
 - Step 5 is to inject entitlements into the target app.
 
+## Known issues
+
+- The installation is much slower than normal ones because `trollstorehelper` only accepts `.ipa` files :-(
+
 ## LICENSE
 
 WTFPL License
