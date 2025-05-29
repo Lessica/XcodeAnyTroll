@@ -6,4 +6,4 @@ Description: An awesome MobileSubstrate tweak!
 Maintainer: Lessica
 Author: Lessica
 Section: Tweaks
-Depends: mobilesubstrate (>= 0.9.5000), com.82flex.libsandyxpc (>= 1.1), com.opa334.libsandy (>= 1.1.3)
+Depends: mobilesubstrate (>= 0.9.5000), com.82flex.libsandyxpc (>= 1.1), com.opa334.libsandy (>= 1.1.3), xcode-any-debug

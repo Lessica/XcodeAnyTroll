@@ -129,9 +129,7 @@ __used static const char *installer_binary(void) {
 
     // It's ok that we don't return the installed app info here,
     // as the client actually doesn't care about it.
-    return @{@"InstalledAppInfoArray" : @[@{
-        
-    }]};
+    return @{@"InstalledAppInfoArray" : @[@{}]};
 }
 
 @end
