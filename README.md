@@ -21,7 +21,9 @@ https://github.com/user-attachments/assets/36af81b7-724b-4fb7-b29e-0e71235c2edd
     <img width="499" alt="截屏2025-05-29 上午5 05 42" src="https://github.com/user-attachments/assets/7ca46b03-6554-4e57-a1b8-04e709e1a0bc" />
     <img width="482" alt="截屏2025-05-29 上午6 04 22" src="https://github.com/user-attachments/assets/f4feae75-393c-44e0-af75-918ec2973fb9" />
 
-5. Add a “Run Script” phase to your target with the following content:
+5. Set `CODE_SIGN_ENTITLEMENTS` to the path of your entitlement.
+6. Ensure that you've installed `ldid-procursus`.
+7. Add a “Run Script” phase to your target with the following content:
 
     ```bash
     if [ "$CODE_SIGNING_ALLOWED" = "NO" ]; then
