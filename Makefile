@@ -1,3 +1,5 @@
+export PACKAGE_VERSION := 1.1
+
 ARCHS := arm64 arm64e
 ifeq ($(THEOS_PACKAGE_SCHEME),)
 TARGET := iphone:clang:14.5:14.0
