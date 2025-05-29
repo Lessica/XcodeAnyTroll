@@ -172,7 +172,7 @@ static const char *BlockSig(id blockObj)
 
 - (BOOL)performInstallationWithError:(NSError **)errorPtr {
     BOOL result = %orig;
-    if (self.recordPromise) {
+    if ([self respondsToSelector:@selector(recordPromise)] && self.recordPromise) {
         gRecordPromise = self.recordPromise;
     }
     return result;
