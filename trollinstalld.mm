@@ -21,7 +21,23 @@ __used static const char *installer_binary(void) {
           bundlePath = [appProxy.bundleURL path];
       }
       if (!bundlePath) {
+          LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:@"com.opa334.TrollStoreLite"];
+          bundlePath = [appProxy.bundleURL path];
+      }
+      if (!bundlePath) {
           NSString *bundleContainerPath = [[[MCMAppContainer containerWithIdentifier:@"com.opa334.TrollStore"
+                                                                               error:nil] url] path];
+          NSArray<NSString *> *bundleItems =
+              [[NSFileManager defaultManager] contentsOfDirectoryAtPath:bundleContainerPath error:nil];
+          for (NSString *bundleItem in bundleItems) {
+              if ([[bundleItem pathExtension] isEqualToString:@"app"]) {
+                  bundlePath = [bundleContainerPath stringByAppendingPathComponent:bundleItem];
+                  break;
+              }
+          }
+      }
+      if (!bundlePath) {
+          NSString *bundleContainerPath = [[[MCMAppContainer containerWithIdentifier:@"com.opa334.TrollStoreLite"
                                                                                error:nil] url] path];
           NSArray<NSString *> *bundleItems =
               [[NSFileManager defaultManager] contentsOfDirectoryAtPath:bundleContainerPath error:nil];
