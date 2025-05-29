@@ -20,6 +20,9 @@ https://github.com/user-attachments/assets/36af81b7-724b-4fb7-b29e-0e71235c2edd
     <img width="482" alt="截屏2025-05-29 上午6 04 22" src="https://github.com/user-attachments/assets/f4feae75-393c-44e0-af75-918ec2973fb9" />
 
 3. Set `CODE_SIGN_ENTITLEMENTS` to the path of your entitlement.
+
+    <img width="597" alt="截屏2025-05-29 下午11 29 07" src="https://github.com/user-attachments/assets/cfd484e3-3237-4c40-8975-5296fa96f755" />
+
 4. Ensure that you’ve installed [`ldid-procursus`](https://github.com/opa334/ldid).
 5. Add a “Run Script” phase to your target with the following content:
 
