@@ -6,7 +6,7 @@ This jailbreak tweak allows you to “click-to-run” (and debug) app directly f
 
 Which makes it super easy to develop TrollStore based system apps, or to test your own apps without the need to sign them with a developer certificate.
 
-Tested on iOS 15.0/15.4/16.2/16.4/16.5.1/16.7.10 with palera1n, Dopamine and Dopamine (RootHide) jailbreaks. TrollStore is required.
+Tested on iOS 15.0/15.4/16.2/16.4/16.5.1/16.7.10/18.3 with palera1n, Dopamine and Dopamine (RootHide) jailbreaks. TrollStore is required.
 
 https://github.com/user-attachments/assets/36af81b7-724b-4fb7-b29e-0e71235c2edd
 

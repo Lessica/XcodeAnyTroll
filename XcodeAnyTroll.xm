@@ -182,6 +182,53 @@ static const char *BlockSig(id blockObj)
 
 %hook MIClientConnection
 
+/* iOS 18.2 */
+- (void)_installURL:(NSURL *)url identity:(id)identity targetingDomain:(NSUInteger)domain options:(MIInstallOptions *)options operationType:(NSUInteger)operationType completion:(void (^)(BOOL, NSArray *, id, NSError *))completion {
+    HBLogDebug(@TAG "installURL:%@ withOptions:%@", url, options);
+
+    if (![options isKindOfClass:%c(MIInstallOptions)] || ![options respondsToSelector:@selector(isDeveloperInstall)] || ![options isDeveloperInstall]) {
+        HBLogDebug(@TAG "Not a developer install, skipping custom handling");
+        %orig;
+        return;
+    }
+
+    void (^replCompletion)(BOOL, NSArray *, id, NSError *) = ^(BOOL succeed, NSArray *appList, id recordPromise, NSError *error) {
+        HBLogDebug(@TAG "completion called with recordPromise:%@ error:%@", recordPromise, error);
+        if (!completion) {
+            return;
+        }
+
+        if (gPackagePath && gPackageIdentifier && ([[error description] containsString:@"0xe800801c"] || [[error description] containsString:@"0xe8008001"])) {
+            NSError *error = nil;
+            NSDictionary *retVal = nil;
+
+            retVal = [GetXpcMessagingCenter() sendMessageAndReceiveReplyName:@"InstallPackage" userInfo:@{
+                @"PackagePath": gPackagePath,
+                @"PackageIdentifier": gPackageIdentifier,
+            } error:&error];
+            if (error) {
+                HBLogDebug(@TAG "XPC error occurred: %@", error);
+                completion(succeed, appList, recordPromise, error);
+                return;
+            }
+
+            HBLogDebug(@TAG "XPC reply received: %@", retVal);
+
+            LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:gPackageIdentifier];
+            LSRecordPromise *recordPromise = [[%c(LSRecordPromise) alloc] initWithRecord:appProxy.correspondingApplicationRecord error:nil];
+
+            /* LSRecordPromise is not properly constructed in some cases, still need some work here. */
+
+            completion(YES, retVal[@"InstalledAppInfoArray"], gRecordPromise ?: recordPromise, nil);
+            return;
+        }
+
+        completion(succeed, appList, recordPromise, error);
+    };
+
+    %orig(url, identity, domain, options, operationType, replCompletion);
+}
+
 /* iOS 16.2 */
 - (void)_installURL:(NSURL *)url identity:(id)identity targetingDomain:(NSUInteger)domain options:(MIInstallOptions *)options completion:(void (^)(BOOL, NSArray *, id, NSError *))completion {
     HBLogDebug(@TAG "installURL:%@ withOptions:%@", url, options);
