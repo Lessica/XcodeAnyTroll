@@ -6,7 +6,7 @@ This jailbreak tweak allows you to “click-to-run” (and debug) app directly f
 
 Which makes it super easy to develop TrollStore based system apps, or to test your own apps without the need to sign them with a developer certificate.
 
-Tested on iOS 15.0/15.4/16.2/16.4/16.5.1/16.7.10/18.3 with palera1n, Dopamine and Dopamine (RootHide) jailbreaks. TrollStore is required.
+Tested on iOS 15.0/15.4/16.2/16.4/16.5.1/16.7.10/18.3 with [palera1n](https://palera.in), [Dopamine](https://ellekit.space/dopamine) and [Dopamine (RootHide)](https://github.com/roothide/Dopamine2-roothide) jailbreaks. TrollStore is required.
 
 https://github.com/user-attachments/assets/36af81b7-724b-4fb7-b29e-0e71235c2edd
 
@@ -33,6 +33,12 @@ https://github.com/user-attachments/assets/36af81b7-724b-4fb7-b29e-0e71235c2edd
     ```
 
     <img width="743" alt="截屏2025-05-29 上午5 06 20" src="https://github.com/user-attachments/assets/611ee75d-006f-423e-a855-112f31aad808" />
+
+## Depends on
+
+- My personal fork of [XcodeAnyDebug](https://github.com/Lessica/XcodeAnyDebug)
+- My tiny XPC library [SandyXpc](https://github.com/Lessica/SandyXpc)
+- opa334’s [libSandy](https://github.com/opa334/libSandy) and [TrollStore](https://github.com/opa334/TrollStore)
 
 ## Known issues
 
