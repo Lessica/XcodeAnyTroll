@@ -27,6 +27,7 @@ https://github.com/user-attachments/assets/36af81b7-724b-4fb7-b29e-0e71235c2edd
 5. Add a “Run Script” phase to your target with the following content:
 
     ```bash
+    PATH="/opt/homebrew/bin:$PATH"
     if [ "$CODE_SIGNING_ALLOWED" = "NO" ]; then
       ldid -S${CODE_SIGN_ENTITLEMENTS} ${CODESIGNING_FOLDER_PATH}
     fi
