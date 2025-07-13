@@ -1,0 +1,140 @@
+name: Build XcodeAnyTroll
+
+on:
+  push:
+    branches: [ release ]
+  workflow_dispatch:
+
+env:
+  FINALPACKAGE: 1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
+jobs:
+  build:
+    runs-on: macos-14
+    
+    strategy:
+      matrix:
+        scheme: ['', 'rootless', 'roothide']
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        # Install xcbeautify for build output formatting
+        # Install ldid for iOS code signing
+        # Install 7zip for compression
+        brew install xcbeautify ldid-procursus p7zip make
+        
+    - name: Checkout roothide/theos
+      uses: actions/checkout@v4
+      with:
+        repository: roothide/theos
+        path: theos-roothide
+        submodules: recursive
+        
+    - name: Checkout SandyXpc
+      uses: actions/checkout@v4
+      with:
+        repository: Lessica/SandyXpc
+        path: SandyXpc
+        
+    - name: Install iOS SDKs
+      run: |
+        export THEOS=$GITHUB_WORKSPACE/theos-roothide
+        cd theos-roothide
+        ./bin/install-sdk iPhoneOS16.5
+        ./bin/install-sdk iPhoneOS14.5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '16.2'
+        
+    - name: Build SandyXpc (${{ matrix.scheme || 'default' }})
+      run: |
+        cd SandyXpc
+        export THEOS=$GITHUB_WORKSPACE/theos-roothide
+        THEOS_PACKAGE_SCHEME=${{ matrix.scheme }} FINALPACKAGE=1 gmake clean stage
+        
+    - name: Build package (${{ matrix.scheme || 'default' }})
+      run: |
+        export THEOS=$GITHUB_WORKSPACE/theos-roothide
+        THEOS_PACKAGE_SCHEME=${{ matrix.scheme }} FINALPACKAGE=1 gmake clean package
+        
+    - name: Prepare artifacts
+      run: |
+        # Create directories for artifacts
+        mkdir -p artifacts/dsym-${{ matrix.scheme || 'default' }}
+        mkdir -p artifacts/packages-${{ matrix.scheme || 'default' }}
+        
+        # Copy dSYM files
+        if [ -d ".theos/obj" ]; then
+          find .theos/obj -name "*.dSYM" -exec cp -r {} artifacts/dsym-${{ matrix.scheme || 'default' }}/ \;
+        fi
+        
+        # Copy packages
+        if [ -d "packages" ]; then
+          cp -r packages/* artifacts/packages-${{ matrix.scheme || 'default' }}/
+        fi
+        
+    - name: Upload dSYM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dsym-${{ matrix.scheme || 'default' }}
+        path: artifacts/dsym-${{ matrix.scheme || 'default' }}
+        if-no-files-found: warn
+        
+    - name: Upload package artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages-${{ matrix.scheme || 'default' }}
+        path: artifacts/packages-${{ matrix.scheme || 'default' }}
+        if-no-files-found: warn
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release'
+    needs: build
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Download all package artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: packages-*
+        path: release-packages
+        merge-multiple: true
+        
+    - name: Create release tag
+      id: tag
+      run: |
+        # Read PACKAGE_VERSION from Makefile
+        PACKAGE_VERSION=$(grep 'PACKAGE_VERSION' Makefile | cut -d' ' -f4)
+        TAG_NAME="v$PACKAGE_VERSION"
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.tag.outputs.tag_name }}
+        name: Release ${{ steps.tag.outputs.tag_name }}
+        body: |
+          Automated build from release branch
+          
+          This release contains packages built with:
+          - Default scheme
+          - Rootless scheme  
+          - Roothide scheme
+          
+          Built on: ${{ github.sha }}
+        files: release-packages/**/*
+        draft: false
+        prerelease: false
