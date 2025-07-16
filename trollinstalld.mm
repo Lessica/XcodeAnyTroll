@@ -110,10 +110,18 @@ __used static const char *installer_binary(void) {
     HBLogDebug(@TAG "Successfully spawned trollstorehelper with pid: %d", pid);
 
     // Wait for the process to finish
-    if (waitpid(pid, &status, 0) < 0) {
+    int waitResult;
+    while ((waitResult = waitpid(pid, &status, 0)) < 0) {
+        if (errno == EINTR) {
+            // Interrupted by signal, retry
+            continue;
+        }
         HBLogDebug(@TAG "Error waiting for trollstorehelper: %s", strerror(errno));
         return @{@"error" : [NSString stringWithFormat:@"Error waiting for process: %s", strerror(errno)]};
     }
+
+    // Clean up the package file after installation
+    [[NSFileManager defaultManager] removeItemAtPath:packagePath error:nil];
 
     if (!WIFEXITED(status)) {
         HBLogDebug(@TAG "trollstorehelper did not exit normally");
